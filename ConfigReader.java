@@ -20,39 +20,39 @@ public class ConfigReader {
     
     //if needed to print in main change variable later
     private void printConfig() {
-    System.out.printf("%20s %20s Parameters %20s\n", "main >> ", "=".repeat(20), "=".repeat(20));
-    System.out.printf("%20s %-18s : %d\n", "main >> ", "Days of simulation", days);
+    System.out.printf("%20s >> %20s Parameters %20s\n", Thread.currentThread().getName(), "=".repeat(20), "=".repeat(20));
+    System.out.printf("%20s >> %-18s : %d\n", Thread.currentThread().getName(), "Days of simulation", days);
 
     // Warehouses
     String[] warehouseNames = new String[warehouseNum];
     for (int i = 0; i < warehouseNum; i++) {warehouseNames[i] = "Warehouse_" + i;}
     String joinedWarehouses = String.join(", ", warehouseNames);
-    System.out.printf("%20s %-18s : [%s]\n", "main >> ", "Warehouses", joinedWarehouses);
+    System.out.printf("%20s >> %-18s : [%s]\n", Thread.currentThread().getName(), "Warehouses", joinedWarehouses);
 
     // Freights & Freight Capacity
     String[] freightNames = new String[freightNum];
     for (int i = 0; i < freightNum; i++) {freightNames[i] = "Freight_" + i;}
     String joinedFreights = String.join(", ", freightNames);
-    System.out.printf("%20s %-18s : [%s]\n", "main >> ", "Freights", joinedFreights);
-    System.out.printf("%20s %-18s : max = %d\n", "main >> ", "Freight capacity", freightCapacity);
+    System.out.printf("%20s >> %-18s : [%s]\n", Thread.currentThread().getName(), "Freights", joinedFreights);
+    System.out.printf("%20s >> %-18s : max = %d\n", Thread.currentThread().getName(), "Freight capacity", freightCapacity);
 
     // SupplierThreads
     String[] supplierThreads = new String[supplierNum];
     for (int i = 0; i < supplierNum; i++) {supplierThreads[i] = "SupplierThread_" + i;}
     String joinedSuppliers = String.join(", ", supplierThreads);
-    System.out.printf("%20s %-18s : [%s]\n", "main >> ", "SupplierThreads", joinedSuppliers);
+    System.out.printf("%20s >> %-18s : [%s]\n", Thread.currentThread().getName(), "SupplierThreads", joinedSuppliers);
 
     // Daily Supply
-    System.out.printf("%20s %-18s : min = %d, max = %d\n", "main >> ", "Daily supply", supplierMin, supplierMax);
+    System.out.printf("%20s >> %-18s : min = %d, max = %d\n", Thread.currentThread().getName(), "Daily supply", supplierMin, supplierMax);
 
     // FactoryThreads
     String[] factoryThreads = new String[factoryNum];
     for (int i = 0; i < factoryNum; i++) {factoryThreads[i] = "FactoryThread_" + i;}
     String joinedFactories = String.join(", ", factoryThreads);
-    System.out.printf("%20s %-18s : [%s]\n", "main >> ", "FactoryThreads", joinedFactories);
+    System.out.printf("%20s >> %-18s : [%s]\n", Thread.currentThread().getName(), "FactoryThreads", joinedFactories);
 
     // Daily Production
-    System.out.printf("%20s %-18s : max = %d\n", "main >> ", "Daily production", factoryMax);
+    System.out.printf("%20s >> %-18s : max = %d\n", Thread.currentThread().getName(), "Daily production", factoryMax);
 }
 
     private void readConfigWithRetry(String filename) {
