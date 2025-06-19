@@ -27,6 +27,7 @@ public class SupplierThread extends Thread {
         this.supplierMin = supplierMin;
         this.supplierMax = supplierMax;
         this.totalDays = totalDays;
+        this.coordinator = coordinator;
         this.random = new Random();
     }
 
@@ -35,22 +36,14 @@ public class SupplierThread extends Thread {
         if (coordinator == null) {
             throw new IllegalArgumentException("Coordinator must not be null");
             }
-        for (int day = 0; day < SimulationCoordinator.days; day++) {
+        for (int day = 0; day < totalDays; day++) {
             try {
-                // Step 3.1: Wait until day header and warehouse/freight info is printed
                 coordinator.dailyStartBarrier.await();
-
-                // Step 3.2: Generate and put random amount of material into a random warehouse
                 int amount = supplierMin + random.nextInt(supplierMax - supplierMin + 1);
-                int WarehouseNumber = random.nextInt(SimulationCoordinator.warehouses.size()); //random warehouse, no repeat of same warehouse
+                int warehouseNumber = random.nextInt(SimulationCoordinator.warehouses.size()); //random warehouse, no repeat of same warehouse
                 SimulationCoordinator.warehouses.get(warehouseNumber).put(amount); //select the warehouse, add the amount
-
-                //System.out.println(getName() + "  >>  put " + amount + " materials    Warehouse_" + warehouseNumber + " balance = %-5d",); //unused output
-
-                // Wait for all SupplierThreads to finish before letting FactoryThreads proceed
+                //System.out.println(getName() + "  >>  put " + amount + " materials    Warehouse_" + warehouseNumber + " balance = %-5d",); //unused output, missing getTotal amount
                 coordinator.supplierDoneBarrier.await();
-
-                // Wait for all FactoryThreads to finish their day too before next cycle
                 coordinator.factoryDoneBarrier.await();
 
             } catch (Exception e) {
