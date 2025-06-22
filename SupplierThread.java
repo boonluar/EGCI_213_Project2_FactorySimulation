@@ -47,7 +47,7 @@ public class SupplierThread extends Thread {
                 coordinator.factoryDoneBarrier.await();
 
             } catch (Exception e) {
-                System.out.println(getName() + ": Error - " + e.getMessage());
+                System.out.println(getName() + ">> Error type: " + e.getMessage());
             }
         }
     }
