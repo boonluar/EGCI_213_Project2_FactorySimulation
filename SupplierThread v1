@@ -1,0 +1,53 @@
+public class SupplierThread implements Runnable {
+    private final List<Warehouse> warehouses;
+    private final List<Freight> freights;
+    private final int minSupply;
+    private final int maxSupply;
+    private final int days;
+    private final SimulationCoordinator coordinator;
+    private final Random rand = new Random();
+
+    public SupplierThread(List<Warehouse> warehouses, List<Freight> freights,
+                          int minSupply, int maxSupply, int days,
+                          SimulationCoordinator coordinator) {
+        if (coordinator == null) {
+            throw new IllegalArgumentException("Coordinator must not be null");
+        }
+        this.warehouses = warehouses;
+        this.freights = freights;
+        this.minSupply = minSupply;
+        this.maxSupply = maxSupply;
+        this.days = days;
+        this.coordinator = coordinator;
+    }
+
+    @Override
+    public void run() {
+        try {
+            for (int day = 1; day <= days; day++) {
+                coordinator.startDayBarrier.await();
+
+                int material = minSupply + rand.nextInt(maxSupply - minSupply + 1);
+
+                Freight freight = freights.get(rand.nextInt(freights.size()));
+                int shipped = freight.ship(material);
+
+                Warehouse warehouse = warehouses.get(rand.nextInt(warehouses.size()));
+                warehouse.put(shipped);
+
+                synchronized (System.out) {
+                    System.out.println("[Day " + day + "] " + Thread.currentThread().getName()
+                            + " supplied " + material + ", shipped " + shipped
+                            + " via " + freight.getName() + " to " + warehouse.getName());
+                }
+
+                coordinator.suppliersDoneBarrier.await();
+                coordinator.productionDoneBarrier.await();
+                coordinator.shippingDoneBarrier.await();
+                coordinator.endOfDayBarrier.await();
+            }
+        } catch (InterruptedException | BrokenBarrierException e) {
+            System.err.println(Thread.currentThread().getName() + " interrupted: " + e.getMessage());
+        }
+    }
+}
