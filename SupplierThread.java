@@ -13,6 +13,8 @@ import java.io.*;
 
 */
 
+
+
 public class SupplierThread extends Thread {
     private final List<Warehouse> warehouse;
     private final int supplierMin;

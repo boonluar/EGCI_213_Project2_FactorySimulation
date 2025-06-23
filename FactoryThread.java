@@ -77,45 +77,47 @@ public class FactoryThread extends Thread {
         System.out.printf("Factory %d >> Day %d >> Shipped %d to Freight %d\n", id, day, shipped, freight.getId());
         return shipped;
     }
-    public class Warehouse {
-    private final int id;
-    private int stock;
+    
+    class Warehouse {
+    private final String name;
+    private int balance = 0;
 
-    public Warehouse(int id) {
-        this.id = id;
-        this.stock = 0;
-    }
+    public Warehouse (String name)               { this.name = name; }
 
-    public synchronized void addMaterials(int amount) {
-        stock += amount;
-    }
+    public synchronized void put (int amount)    { balance += amount; }
 
-    public synchronized int getMaterials(int maxAmount) {
-        int taken = Math.min(maxAmount, stock);
-        stock -= taken;
+    public synchronized int get (int amount) {
+        int taken = Math.min (amount, balance);
+        balance -= taken;
         return taken;
     }
 
-    public int getId() {
-        return id;
-    }
-}
-    public class Freight {
-    private final int id;
-    private final int maxCapacityPerDay;
+    public synchronized int getBalance()         { return balance; } 
 
-    public Freight(int id, int maxCapacityPerDay) {
-        this.id = id;
-        this.maxCapacityPerDay = maxCapacityPerDay;
+    public String getName()                      { return name; } 
     }
 
-    public synchronized int shipProducts(int amount) {
-        int shipped = Math.min(amount, maxCapacityPerDay);
-        return shipped;
-    }
+    class Freight {
+        private final String name;
+        private final int max;
+        private int loaded = 0;
 
-    public int getId() {
-        return id;
+        public Freight (String name, int maxCapacity) {
+            this.name = name;
+            this.max = maxCapacity;
+        }
+
+        public synchronized int ship (int amount) {
+            int room = max - loaded;
+            int toShip = Math.min(room, amount);
+            loaded += toShip;
+            return toShip;
+        }
+
+        public synchronized void reset ()             { loaded = 0; }
+
+        public synchronized int getRemaining ()       { return max - loaded; }
+
+        public String getName()                       { return name; }
     }
-}
 }
