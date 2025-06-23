@@ -27,7 +27,7 @@ public class Main {
         int factoryNum = config.getFactoryNum();
         int factoryMax = config.getFactoryMax();
 
-        /*
+        
         // Create shared resources
         List<Warehouse> warehouses = new ArrayList<>();
         for (int i = 0; i < warehouseNum; i++) {
@@ -106,9 +106,5 @@ public class Main {
         }
     }
 }
-
-*/
-
-        
     }
 }
