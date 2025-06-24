@@ -16,7 +16,7 @@ import java.io.*;
 
 
 public class SupplierThread extends Thread {
-    private final List<Warehouse> warehouse;
+    private final List<Warehouse> warehouses;
     private final int supplierMin;
     private final int supplierMax;
     private final int totalDays;
@@ -24,11 +24,11 @@ public class SupplierThread extends Thread {
     private final Random random;
 
 
-    public SupplierThread(List<Warehouse> warehouse, int supplierMin, int supplierMax, int days, SimulationCoordinator coordinator) { 
-        this.warehouse = warehouse;
+    public SupplierThread(List<Warehouse> warehouses, int supplierMin, int supplierMax, int days, SimulationCoordinator coordinator) { 
+        this.warehouses = warehouses;
         this.supplierMin = supplierMin;
         this.supplierMax = supplierMax;
-        this.totalDays = totalDays;
+        this.totalDays = days;
         this.coordinator = coordinator;
         this.random = new Random();
     }
@@ -40,13 +40,13 @@ public class SupplierThread extends Thread {
             }
         for (int day = 0; day < totalDays; day++) {
             try {
-                coordinator.dailyStartBarrier.await();
+                coordinator.startDayBarrier.await();
                 int amount = supplierMin + random.nextInt(supplierMax - supplierMin + 1);
-                int warehouseNumber = random.nextInt(SimulationCoordinator.warehouses.size()); //random warehouse, no repeat of same warehouse
-                SimulationCoordinator.warehouses.get(warehouseNumber).put(amount); //select the warehouse, add the amount
+                int warehouseNumber = random.nextInt(warehouses.size()); //random warehouse, no repeat of same warehouse
+                warehouses.get(warehouseNumber).put(amount); //select the warehouse, add the amount
                 //System.out.println(getName() + "  >>  put " + amount + " materials    Warehouse_" + warehouseNumber + " balance = %-5d",); //unused output, missing getTotal amount
-                coordinator.supplierDoneBarrier.await();
-                coordinator.factoryDoneBarrier.await();
+                coordinator.suppliersDoneBarrier.await();
+                coordinator.productionDoneBarrier.await();
 
             } catch (Exception e) {
                 System.out.println(getName() + ">> Error type: " + e.getMessage());
