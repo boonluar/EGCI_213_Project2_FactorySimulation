@@ -8,10 +8,11 @@ public class FactoryThread extends Thread {
     private final int id;
     private final int maxProduction;
     private final int numDays;
+    //private static final List<FactoryThread> instances = new ArrayList<>();
     private final Warehouse[] warehouses;
     private final Freight[] freights;
     private final CyclicBarrier[] barriers; 
-    private int totalProduced = 0;
+    private int totalCreated = 0;
     private int totalShipped = 0;
     private int unshipped = 0;
 
@@ -26,6 +27,7 @@ public class FactoryThread extends Thread {
         this.warehouses = warehouses;
         this.freights = freights;
         this.barriers = barriers;
+        //instances.add(this);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class FactoryThread extends Thread {
                 barriers[1].await();
 
                 int producedToday = tryProduce(day);
-                totalProduced += producedToday;
+                totalCreated += producedToday;
 
                 barriers[2].await(); 
 
@@ -60,64 +62,42 @@ public class FactoryThread extends Thread {
             }
         }
 
-        double percentShipped = (totalProduced == 0) ? 0 : (100.0 * totalShipped / totalProduced);
+        double percentShipped = (totalCreated == 0) ? 0 : (100.0 * totalShipped / totalCreated);
         System.out.printf("Factory %d >> Shipped %.2f%% of produced products\n", id, percentShipped);
     }
 
     private int tryProduce(int day) {
         Warehouse wh = warehouses[random.nextInt(warehouses.length)];
         int got = wh.getMaterials(maxProduction);
-        System.out.printf("Factory %d >> Day %d >> Got %d materials from Warehouse %d\n", id, day, got, wh.getId());
+        System.out.printf("Factory %d >> Day %d >> Got %d materials from Warehouse %d\n", id, day, got, wh.getId());  //missing id creation in main?
         return got;
     }
 
     private int tryShip(int day, int amountToShip) {
         Freight freight = freights[random.nextInt(freights.length)];
         int shipped = freight.shipProducts(amountToShip);
-        System.out.printf("Factory %d >> Day %d >> Shipped %d to Freight %d\n", id, day, shipped, freight.getId());
+        System.out.printf("Factory %d >> Day %d >> Shipped %d to Freight %d\n", id, day, shipped, freight.getId());  //missing id creation in main?
         return shipped;
     }
+    /*
+    public static List<FactoryThread> getInstances() {
+        return instances;
+    }*/
     
-    class Warehouse {
-    private final String name;
-    private int balance = 0;
-
-    public Warehouse (String name)               { this.name = name; }
-
-    public synchronized void put (int amount)    { balance += amount; }
-
-    public synchronized int get (int amount) {
-        int taken = Math.min (amount, balance);
-        balance -= taken;
-        return taken;
+    public int getTotalCreated() {
+        return totalCreated;
     }
 
-    public synchronized int getBalance()         { return balance; } 
-
-    public String getName()                      { return name; } 
+    public int getTotalShipped() {
+        return totalShipped;
     }
 
-    class Freight {
-        private final String name;
-        private final int max;
-        private int loaded = 0;
-
-        public Freight (String name, int maxCapacity) {
-            this.name = name;
-            this.max = maxCapacity;
-        }
-
-        public synchronized int ship (int amount) {
-            int room = max - loaded;
-            int toShip = Math.min(room, amount);
-            loaded += toShip;
-            return toShip;
-        }
-
-        public synchronized void reset ()             { loaded = 0; }
-
-        public synchronized int getRemaining ()       { return max - loaded; }
-
-        public String getName()                       { return name; }
+    public int getUnshipped() {
+        return unshipped;
     }
+
+    public double getShippingRate() {
+        return (totalCreated == 0) ? 0 : (100.0 * totalShipped / totalCreated);
+    }
+
 }
